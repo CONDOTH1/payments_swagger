@@ -1,0 +1,1610 @@
+openapi: 3.0.2
+servers:
+  - url: /v1/organizations/{org_id}/payments/
+info:
+  description: |-
+    This is the proposed swagger for the payments proposal first iteration
+    It includes both the public Payment apis and the private Engine API updates
+  version: 1.0.17
+  title: Payment Proposal - Payment APIs
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: thady@luna-protocol.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: Payment Providers
+    description: Everything about your Organizations Payment Providers
+    externalDocs:
+      description: Find out more
+      url: 'http://swagger.io'
+  - name: Bank Accounts
+    description: Everything about your Payment Bank Accounts
+    externalDocs:
+      description: Find out more
+      url: 'http://swagger.io'
+  - name: KYC Details
+    description: Everything about your Payment Know Your Customer Details
+    externalDocs:
+      description: Find out more
+      url: 'http://swagger.io'
+  - name: Addresses
+    description: Everything about your Payment KYC Addresses
+    externalDocs:
+      description: Find out more
+      url: 'http://swagger.io'
+  - name: Modulr
+    description: Everything about your Modulr Account
+    externalDocs:
+      description: Find out more about Modulr Accounts
+      url: 'http://swagger.io'
+  - name: Yapily
+    description: Everything about your Yapily Account
+    externalDocs:
+      description: Find out more about Yapily Accounts
+      url: 'http://swagger.io'
+  - name: Truelayer
+    description: Everything about your Truelayer Account
+    externalDocs:
+      description: Find out more about Truelayer Accounts
+      url: 'http://swagger.io'
+paths:
+  /payment-providers:
+    post:
+      tags:
+        - Payment Providers
+      summary: Add organizations payment providers details
+      description: Add organizations payment providers details
+      operationId: addPaymentProvider
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentProviders'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Create account details
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                payment_provider:
+                  $ref: '#/components/schemas/PaymentProviderNames'
+                application_id:
+                  type: string
+                  description: payment provider application id or key
+                application_secret:
+                  type: string
+                  description: payment provider application secret
+                application_certificate:
+                  type: string
+                  description: payment provider application cert for signing requests
+              type: object
+    get:
+      tags:
+        - Payment Providers
+      summary: Finds payment providers for organization
+      description: Multiple values can be provided to filter
+      operationId: findPaymentProviders
+      parameters:
+        - name: payment_provider
+          in: query
+          description: Payment provider name
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentProviders'
+        '400':
+          description: Invalid status value
+      security:
+        - api_key: []
+  /payment-providers/{payment_provider_id}:
+    patch:
+      tags:
+        - Payment Providers
+      summary: Update payment providers for organization
+      description: Update payment providers for organization
+      operationId: updatePaymentProviders
+      parameters:
+        - name: payment_provider_id
+          in: path
+          description: payment provider id to update
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentProviders'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Update a existing organizations payment provider
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                application_id:
+                  type: string
+                  description: payment provider application id or key
+                application_secret:
+                  type: string
+                  description: payment provider application secret
+                application_certificate:
+                  type: string
+                  description: payment provider application cert for signing requests
+              type: object
+    delete:
+      tags:
+        - Payment Providers
+      summary: Deletes Payment Provider
+      description: ''
+      operationId: deleteBankAccount
+      parameters:
+        - name: bank_account_id
+          in: path
+          description: payment provider id to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          description: Invalid request
+      security:
+        - api_key: []
+  /payment-providers/{payment_provider_id}/modulr:
+    post:
+      tags:
+        - Modulr
+      summary: Add Modulr account details for participant
+      description: Add Modulr account details for participant
+      operationId: addModulrAccount
+      parameters:
+        - name: payment_provider_id
+          in: path
+          description: payment provider id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModulrAccounts'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Create Modulr Account
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - participant_id
+              properties:
+                participant_id:
+                  type: string
+                  format: uuid
+                account_id:
+                  type: string
+                  description: modulr account id
+                customer_id:
+                  type: string
+                  description: modulr customer id
+              type: object
+    get:
+      tags:
+        - Modulr
+      summary: Finds Modulr accounts for organization
+      description: Multiple values can be provided to filter
+      operationId: findModulrAccounts
+      parameters:
+        - name: payment_provider_id
+          in: path
+          description: payment provider id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: participant_id
+          in: query
+          description: Id or participant
+          required: false
+          schema:
+            type: string
+        - name: account_id
+          in: query
+          description: modulr account id
+          required: false
+          schema:
+            type: string
+        - name: customer_id
+          in: query
+          description: modulr customer id
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModulrAccounts'
+        '400':
+          description: Invalid status value
+      security:
+        - api_key: []
+  /payment-providers/{payment_provider_id}/modulr/{modulr_account_id}:
+    patch:
+      tags:
+        - Modulr
+      summary: Update modulr account details for participant
+      description: Update modulr account details for participant
+      operationId: updateModulrAccount
+      parameters:
+        - name: payment_provider_id
+          in: path
+          description: payment provider id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: modulr_account_id
+          in: path
+          description: modulr account id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModulrAccounts'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Update a existing modulr account details
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                account_id:
+                  type: string
+                  description: modulr account id
+                customer_id:
+                  type: string
+                  description: modulr customer id
+              type: object
+    delete:
+      tags:
+        - Modulr
+      summary: Deletes Modulr Account for participant
+      description: ''
+      operationId: deleteModulrAccount
+      parameters:
+        - name: modulr_account_id
+          in: path
+          description: modulr account id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          description: Invalid request
+      security:
+        - api_key: []
+  /payment-providers/{payment_provider_id}/modulr/{modulr_account_id}/beneficiaries:
+    post:
+      tags:
+        - Modulr
+      summary: Add Modulr account beneficiary for participant
+      description: Add Modulr account beneficiary for participant
+      operationId: addModulrBeneficiary
+      parameters:
+        - name: payment_provider_id
+          in: path
+          description: payment provider id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: modulr_account_id
+          in: path
+          description: modulr account id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModulrBeneficiaries'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Create Modulr Beneficiary
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - beneficiary_id
+              properties:
+                beneficiary_id:
+                  type: string
+                  format: uuid
+              type: object
+    get:
+      tags:
+        - Modulr
+      summary: Finds Modulr account beneficiaries
+      description: Multiple values can be provided to filter
+      operationId: findModulrAccountBeneficiary
+      parameters:
+        - name: payment_provider_id
+          in: path
+          description: payment provider id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: modulr_account_id
+          in: path
+          description: modulr account id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: beneficiary_id
+          in: query
+          description: beneficiary id
+          required: false
+          schema:
+            type: string
+        - name: modulr_beneficiary_id
+          in: query
+          description: modulr beneficiary id
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModulrBeneficiaries'
+        '400':
+          description: Invalid status value
+      security:
+        - api_key: []
+  /payment-providers/{payment_provider_id}/modulr/{modulr_account_id}/beneficiaries/{modulr_beneficiary_id}:
+    patch:
+      tags:
+        - Modulr
+      summary: Update modulr account beneficiary details
+      description: Update modulr account beneficiary details
+      operationId: updateModulrAccountBeneficiary
+      parameters:
+        - name: payment_provider_id
+          in: path
+          description: payment provider id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: modulr_account_id
+          in: path
+          description: modulr account id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: modulr_beneficiary_id
+          in: path
+          description: modulr beneficiary id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModulrBeneficiaries'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Update a existing modulr account beneficiary details
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                beneficiary_id:
+                  type: string
+                  description: modulr account beneficiary id
+              type: object
+    delete:
+      tags:
+        - Modulr
+      summary: Deletes Modulr Beneficiary for Account
+      description: ''
+      operationId: deleteModulrBeneficiary
+      parameters:
+        - name: payment_provider_id
+          in: path
+          description: payment provider id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: modulr_account_id
+          in: path
+          description: modulr account id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: modulr_beneficiary_id
+          in: path
+          description: modulr beneficiary id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          description: Invalid request
+      security:
+        - api_key: []
+  /payment-providers/{payment_provider_id}/yapily:
+    post:
+      tags:
+        - Yapily
+      summary: Add Yapily account details for participant
+      description: Add Yapily account details for participant
+      operationId: addModulrAccount
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YapilyAccounts'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Create Yapily Account
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - participant_id
+              properties:
+                participant_id:
+                  type: string
+                  format: uuid
+                user_id:
+                  type: string
+                  description: yapily user id
+              type: object
+    get:
+      tags:
+        - Yapily
+      summary: Finds Yapily accounts for organization
+      description: Multiple values can be provided to filter
+      operationId: findYapilyAccounts
+      parameters:
+        - name: participant_id
+          in: query
+          description: Id or participant
+          required: false
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          description: yapily user id
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/YapilyAccounts'
+        '400':
+          description: Invalid status value
+      security:
+        - api_key: []
+  /payment-providers/{payment_provider_id}/yapily/{yapily_account_id}:
+    patch:
+      tags:
+        - Yapily
+      summary: Update yapily account details for participant
+      description: Update yapily account details for participant
+      operationId: updateYapilyAccount
+      parameters:
+        - name: yapily_account_id
+          in: path
+          description: yapily account id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YapilyAccounts'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Update a existing yapily account details
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                user_id:
+                  type: string
+                  description: yapily user id
+              type: object
+    delete:
+      tags:
+        - Yapily
+      summary: Deletes Yapily Account for participant
+      description: ''
+      operationId: deleteYapilyAccount
+      parameters:
+        - name: yapily_account_id
+          in: path
+          description: yapily account id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          description: Invalid request
+      security:
+        - api_key: []
+  /payment-providers/{payment_provider_id}/truelayer:
+    post:
+      tags:
+        - Truelayer
+      summary: Add Truelayer account details for participant
+      description: Add Truelayer account details for participant
+      operationId: addModulrAccount
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TruelayerAccounts'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Create Truelayer Account
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - participant_id
+              properties:
+                participant_id:
+                  type: string
+                  format: uuid
+                merchant_account_id:
+                  type: string
+                  description: Truelayer merchant account id
+              type: object
+    get:
+      tags:
+        - Truelayer
+      summary: Finds Truelayer accounts for organization
+      description: Multiple values can be provided to filter
+      operationId: findTruelayerAccounts
+      parameters:
+        - name: participant_id
+          in: query
+          description: Id or participant
+          required: false
+          schema:
+            type: string
+        - name: merchant_account_id
+          in: query
+          description: Truelayer merchant account id
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TruelayerAccounts'
+        '400':
+          description: Invalid status value
+      security:
+        - api_key: []
+  /payment-providers/{payment_provider_id}/truelayer/{truelayer_account_id}:
+    patch:
+      tags:
+        - Truelayer
+      summary: Update truelayer account details for participant
+      description: Update truelayer account details for participant
+      operationId: updateTruelayerAccount
+      parameters:
+        - name: truelayer_account_id
+          in: path
+          description: truelayer account id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TruelayerAccounts'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Update a existing truelayer account details
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                merchant_account_id:
+                  type: string
+                  description: truelayer merchant account id
+              type: object
+    delete:
+      tags:
+        - Truelayer
+      summary: Deletes Truelayer Account for participant
+      description: ''
+      operationId: deleteTruelayerAccount
+      parameters:
+        - name: truelayer_account_id
+          in: path
+          description: truelayer account id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          description: Invalid request
+      security:
+        - api_key: []
+  /bank-accounts:
+    post:
+      tags:
+        - Bank Accounts
+      summary: Add participant account details
+      description: Add participant account details
+      operationId: addAccountDetails
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccounts'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Create account details
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - participant_id
+                - currency
+              properties:
+                participant_id:
+                  type: string
+                  format: uuid
+                currency:
+                  type: string
+                  maxLength: 3
+                  description: ISO 4217 Alpha 3 Currency Code
+                account_number:
+                  type: string
+                  description: bank account number
+                sort_code:
+                  type: string
+                  description: sort code number (sanitised i.e. hyphens or spaces removed)
+                  maxLength: 6
+                iban:
+                  type: string
+                  description: IBAN number
+                swift_bic:
+                  type: string
+                  description: Swift or BIC number
+                country:
+                  type: string
+                  maxLength: 3
+                  description: ISO 3166 Alpha 3 country code of financial institution
+              type: object
+    get:
+      tags:
+        - Bank Accounts
+      summary: Finds bank accounts
+      description: Multiple values can be provided to filter
+      operationId: findBankAccounts
+      parameters:
+        - name: participant_id
+          in: query
+          description: Participant bank account belongs too
+          required: false
+          schema:
+            type: string
+        - name: sort_code
+          in: query
+          description: sort code filter
+          required: false
+          schema:
+            type: string
+        - name: account_number
+          in: query
+          description: account number filter
+          required: false
+          schema:
+            type: string
+        - name: iban
+          in: query
+          description: iban filter
+          required: false
+          schema:
+            type: string
+        - name: swift_bic
+          in: query
+          description: swift bic filter
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BankAccounts'
+        '400':
+          description: Invalid status value
+      security:
+        - api_key: []
+  /bank-accounts/{bank_account_id}:
+    patch:
+      tags:
+        - Bank Accounts
+      summary: Update participant bank accounts
+      description: Update participant bank accounts
+      operationId: updateAccountDetails
+      parameters:
+        - name: bank_account_id
+          in: path
+          description: bank accounts id to update
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccounts'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Update a existing bank account
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                account_number:
+                  type: string
+                  description: bank account number
+                sort_code:
+                  type: string
+                  description: sort code number (sanitised i.e. hyphens or spaces removed)
+                  maxLength: 6
+                iban:
+                  type: string
+                  description: IBAN number
+                swift_bic:
+                  type: string
+                  description: Swift or BIC number
+                country:
+                  type: string
+                  maxLength: 3
+                  description: ISO 3166 Alpha 3 country code of financial institution
+              type: object
+    delete:
+      tags:
+        - Bank Accounts
+      summary: Deletes bank account
+      description: ''
+      operationId: deleteBankAccount
+      parameters:
+        - name: bank_account_id
+          in: path
+          description: bank account id to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          description: Invalid pet value
+      security:
+        - api_key: []
+  /kyc-details:
+    post:
+      tags:
+        - KYC Details
+      summary: Add participant Know Your Customer details
+      description: Add participant Know Your Customer details
+      operationId: addKYCDetails
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KycDetails'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Create new KYC details
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - participant_id
+              properties:
+                participant_id:
+                  type: string
+                  format: uuid
+                email:
+                  type: string
+                  description: participant email address
+                  format: email
+                phone_number:
+                  type: string
+                  description: participant phone number
+                dob:
+                  type: string
+                  description: date of birth
+                  format: date
+              type: object
+    get:
+      tags:
+        - KYC Details
+      summary: Finds Know Your Customer details
+      description: Multiple values can be provided to filter
+      operationId: findKycDetails
+      parameters:
+        - name: participant_id
+          in: query
+          description: Participant account details belong too
+          required: false
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: email filter
+          required: false
+          schema:
+            type: string
+            format: email
+        - name: phone_number
+          in: query
+          description: phone number filter
+          required: false
+          schema:
+            type: string
+        - name: dob
+          in: query
+          description: date of birth filter
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KycDetails'
+        '400':
+          description: Invalid status value
+      security:
+        - api_key: []
+  /kyc-details/{kyc_details_id}:
+    patch:
+      tags:
+        - KYC Details
+      summary: Update Know Your Customer details
+      description: Update participant Know Your Customer details
+      operationId: updateKycDetails
+      parameters:
+        - name: kyc_details_id
+          in: path
+          description: kyc details id to update
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KycDetails'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Update a new pet in the store
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  type: string
+                  description: participant email address
+                  format: email
+                phone_number:
+                  type: string
+                  description: participant phone number
+                dob:
+                  type: string
+                  description: date of birth
+                  format: date
+    delete:
+      tags:
+        - KYC Details
+      summary: Deletes kyc details
+      description: ''
+      operationId: deleteKycDetails
+      parameters:
+        - name: kyc_details_id
+          in: path
+          description: kyc details id to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          description: Invalid request
+      security:
+        - api_key: []
+  /addresses:
+    post:
+      tags:
+        - Addresses
+      summary: Add participant address for KYC checks
+      description: Add participant address for KYC checks
+      operationId: addAddresses
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Addresses'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Create a new address for kyc checks
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - participant_id
+              type: object
+              description: address of participant for kyc details
+              properties:
+                participant_id:
+                  type: string
+                  format: uuid
+                address_line1:
+                  type: string
+                  description: first line of address
+                address_line2:
+                  type: string
+                  description: second line of address
+                city:
+                  type: string
+                  description: city of address
+                state:
+                  type: string
+                  description: city of address
+                postcode:
+                  type: string
+                  description: zip or post code of address
+                country:
+                  type: string
+                  maxLength: 3
+                  description: ISO 3166 Alpha 3 country code
+                from:
+                  type: string
+                  format: date
+                  description: date of habitation
+                to:
+                  type: string
+                  format: date
+                  description: date of vacation from address
+                current:
+                  type: boolean
+                  description: is current address
+    get:
+      tags:
+        - Addresses
+      summary: Finds Addresses used for KYC checks
+      description: Multiple values can be provided to filter
+      operationId: findAddress
+      parameters:
+        - name: participant_id
+          in: query
+          description: Participant account details belong too
+          required: false
+          schema:
+            type: string
+        - name: country
+          in: query
+          description: country code filter
+          required: false
+          schema:
+            type: string
+            maxLength: 3
+        - name: postcode
+          in: query
+          description: postcode filter
+          required: false
+          schema:
+            type: string
+        - name: from
+          in: query
+          description: from filter
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          description: to filter
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: current
+          in: query
+          description: current address filter
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Addresses'
+        '400':
+          description: Invalid status value
+      security:
+        - api_key: []
+  /addresses/{address_id}:
+    patch:
+      tags:
+        - Addresses
+      summary: Update Address
+      description: Update participant Addresses used for KYC checks
+      operationId: updateAddress
+      parameters:
+        - name: address_id
+          in: path
+          description: Address id to update
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Addresses'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorised
+        '403':
+          description: Forbidden
+        '409':
+          description: Data Conflict
+        '500':
+          description: oooops
+      security:
+        - api_key: []
+      requestBody:
+        description: Update Address used for KYC checks
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                address_line1:
+                  type: string
+                  description: first line of address
+                address_line2:
+                  type: string
+                  description: second line of address
+                city:
+                  type: string
+                  description: city of address
+                state:
+                  type: string
+                  description: city of address
+                postcode:
+                  type: string
+                  description: zip or post code of address
+                country:
+                  type: string
+                  maxLength: 3
+                  description: ISO 3166 Alpha 3 country code
+                from:
+                  type: string
+                  format: date
+                  description: date of habitation
+                to:
+                  type: string
+                  format: date
+                  description: date of vacation from address
+                current:
+                  type: boolean
+                  description: is current address
+    delete:
+      tags:
+        - Addresses
+      summary: Deletes address
+      description: ''
+      operationId: deleteAddress
+      parameters:
+        - name: address_id
+          in: path
+          description: address details id to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          description: Invalid request
+      security:
+        - api_key: []
+components:
+  schemas:
+    PaymentProviders:
+      required:
+        - payment_provider_id
+      type: object
+      properties:
+          payment_provider_id:
+            type: string
+            format: uuid
+          payment_provider:
+            $ref: '#/components/schemas/PaymentProviderNames'
+          application_id:
+            type: string
+            description: payment provider application id or key
+          application_secret:
+            type: string
+            description: obfuscated payment provider application secret
+            example: db12****32ks
+          application_certificate:
+            type: string
+            description: DO WE WANT THIS? FILE UPLOAD? obfuscated payment provider application cert for signing requests
+            example: -----BEGIN EC PRIVATE KEY-----\n***0JKFzBvCYF8GasKkqlE0tRI8aeGCaiQnJVPvBKkE7g==\n-----END EC PRIVATE KEY-----
+    PaymentProviderNames:
+      type: string
+      enum: 
+        - YAPILY
+        - MODULR
+        - TRUELAYER
+        - GRIFFIN
+    ModulrAccounts:
+      required:
+        - modulr_account_id
+      type: object
+      properties:
+          modulr_account_id:
+            type: string
+            format: uuid
+            description: luna id for account
+          participant_id:
+            type: string
+            format: uuid
+          payment_provider_id:
+            type: string
+            format: uuid
+          account_id:
+            type: string
+            description: modulr account id
+          customer_id:
+            type: string
+            description: modulr customer id
+    ModulrBeneficiaries:
+      type: object
+      required:
+        - beneficiary_id
+      properties:
+        modulr_beneficiary_id:
+          type: string
+          format: uuid
+          description: Luna id for beneficiary
+        beneficiary_id:
+          type: string
+          description: Modulr id for record
+    YapilyAccounts:
+      required:
+        - yapily_account_id
+      type: object
+      properties:
+          yapily_account_id:
+            type: string
+            format: uuid
+          participant_id:
+            type: string
+            format: uuid
+          payment_provider_id:
+            type: string
+            format: uuid
+          user_id:
+            type: string
+            description: yapily account id
+    TruelayerAccounts:
+      required:
+        - truelayer_account_id
+      type: object
+      properties:
+          truelayer_account_id:
+            type: string
+            format: uuid
+          participant_id:
+            type: string
+            format: uuid
+          payment_provider_id:
+            type: string
+            format: uuid
+          merchant_account_id:
+            type: string
+            description: truelayer merchant account id
+    BankAccounts:
+      required:
+        - account_details_id
+        - participant_id
+        - currency
+      type: object
+      properties:
+          account_details_id:
+            type: string
+            format: uuid
+          participant_id:
+            type: string
+            format: uuid
+          currency:
+            type: string
+            maxLength: 3
+            description: ISO 4217 Alpha 3 Currency Code
+          account_number:
+            type: string
+            description: bank account number
+          sort_code:
+            type: string
+            description: sort code number (sanitised i.e. hyphens or spaces removed)
+            maxLength: 6
+          iban:
+            type: string
+            description: IBAN number
+          swift_bic:
+            type: string
+            description: Swift or BIC number
+          country:
+            type: string
+            maxLength: 3
+            description: ISO 3166 Alpha 3 country code of financial institution
+    KycDetails:
+      type: object
+      required:
+        - kyc_details_id
+      properties:
+          kyc_details_id:
+            type: string
+            format: uuid
+          participant_id:
+            type: string
+            format: uuid
+          email:
+            type: string
+            description: participant email address
+            format: email
+          phone_number:
+            type: string
+            description: participant phone number
+          dob:
+            type: string
+            description: date of birth
+            format: date
+    Addresses:
+      type: object
+      properties:
+          address:
+            type: array
+            items:
+              type: object
+              description: address of participant for kyc checks
+              required:
+                - address_id
+              properties:
+                address_id:
+                  type: string
+                  format: uuid
+                address_line1:
+                  type: string
+                  description: first line of address
+                address_line2:
+                  type: string
+                  description: second line of address
+                city:
+                  type: string
+                  description: city of address
+                state:
+                  type: string
+                  description: city of address
+                postcode:
+                  type: string
+                  description: zip or post code of address
+                country:
+                  type: string
+                  maxLength: 3
+                  description: ISO 3166 Alpha 3 country code
+                from:
+                  type: string
+                  format: date
+                  description: date of habitation
+                to:
+                  type: string
+                  format: date
+                  description: date of vacation from address
+                current:
+                  type: boolean
+                  description: is current address
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
